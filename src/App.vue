@@ -1,47 +1,60 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
-</script>
-
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
+  <div>
+    <form @submit.prevent="addTask">
+      <h2 contenteditable="true" @input="updateTitle($event)">{{ titulo }}</h2>
+      <input v-model.trim="nuevaTarea" placeholder="Agrega una tarea" required @keyup.enter="addTask">
+      <button type="submit">Agregar Tarea</button>
+    </form>
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+    <ul>
+      <li v-for="task in tareas" :key="task.id">
+        <input v-model="task.name" @change="editTask(task.id)">
+        <button @click="deleteTask(task.id)">Borrar tarea</button>
+      </li>
+    </ul>
+  </div>
 </template>
 
+<script setup>
+import { ref, reactive } from 'vue';
+
+let nuevaTarea = ref('');
+let tareas = reactive([]);
+let titulo = ref('Lista de tareas');
+
+const addTask = () => {
+  const id = tareas.length + 1;
+  tareas.push({ id, name: nuevaTarea.value });
+  nuevaTarea.value = '';
+};
+const deleteTask = (id) => {
+  const index = tareas.findIndex(task => task.id === id);
+  if (index !== -1) {
+    tareas.splice(index, 1);
+  }
+};
+const editTask = (id) => {
+  const task = tareas.find(task => task.id === id);
+  nuevatarea.value = task.name;
+  nuevaTarea.value = '';
+};
+const updateTitle = (event) => {
+  title.value = event.target.innerText;
+};
+</script>
+
 <style scoped>
-header {
-  line-height: 1.5;
+form {
+  padding: 15px 15px;
+  margin: 0 5px;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+form h2 {
+  padding: 5px 5px;
+  color: black;
+  font-weight: bold;
+  font-size: 32px;
+  margin-bottom: 10px;
+  width: 30%;
 }
 </style>
